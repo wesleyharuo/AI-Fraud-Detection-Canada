@@ -30,6 +30,14 @@ Try the fraud-scoring model online, no install needed — fill in a transaction 
 
 `demo/app.py` loads the trained model from `model/artifacts.joblib` (already included in this repo) and falls back to training it automatically on first boot if the file is missing.
 
+### Restricting access (recommended for client previews)
+By default the Space URL is open to anyone who has the link. To require a login before the demo loads:
+1. In the Space, go to **Settings → Variables and secrets → New secret**.
+2. Add two secrets: `DEMO_USERNAME` and `DEMO_PASSWORD` (pick any values you like).
+3. Restart the Space. The public link now shows a login screen — share those credentials only with the client you want to preview it.
+
+Only you control these secrets (they're never in the repo, never visible to Space visitors, and only you and collaborators you explicitly add to your Hugging Face account can see or change them). Removing the secrets makes the demo public again.
+
 ##  Quickstart
 ```bash
 python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate

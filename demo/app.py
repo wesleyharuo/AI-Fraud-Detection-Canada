@@ -278,4 +278,16 @@ with gr.Blocks(
     )
 
 if __name__ == "__main__":
-    demo.launch()
+    # Optional access control: set DEMO_USERNAME / DEMO_PASSWORD as Space
+    # secrets to require a login before the public link works. Leave both
+    # unset for an open demo (e.g. local development).
+    demo_user = os.environ.get("DEMO_USERNAME")
+    demo_pass = os.environ.get("DEMO_PASSWORD")
+    auth = (demo_user, demo_pass) if demo_user and demo_pass else None
+    auth_message = (
+        "Acesso restrito — peça as credenciais a quem compartilhou este link."
+        if auth
+        else None
+    )
+
+    demo.launch(auth=auth, auth_message=auth_message)
