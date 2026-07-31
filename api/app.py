@@ -1,5 +1,12 @@
+import sys
+import os
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src")
+)
+
 from fastapi import FastAPI, Request
-from pydantic import BaseModel
+from fastapi.responses import Response
 import pandas as pd
 from fraudkit.model import load_model, predict_proba
 from fraudkit.schema import Transaction
@@ -8,11 +15,16 @@ from fraudkit.schema import Transaction
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 import time
 
-app = FastAPI(title="Canada Fraud Detection API", version="1.0")
-bundle = load_model("model/artifacts.joblib")
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
-REQ_COUNT = Counter("api_requests_total", "Total API requests", ["endpoint", "method", "status"])
+app = FastAPI(title="Canada Fraud Detection API", version="1.0")
+bundle = load_model(os.path.join(ROOT, "model", "artifacts.joblib"))
+
+REQ_COUNT = Counter(
+    "api_requests_total", "Total API requests", ["endpoint", "method", "status"]
+)
 REQ_LATENCY = Histogram("api_request_latency_seconds", "Request latency", ["endpoint"])
+
 
 @app.middleware("http")
 async def metrics_middleware(request: Request, call_next):
@@ -20,18 +32,23 @@ async def metrics_middleware(request: Request, call_next):
     response = await call_next(request)
     latency = time.time() - start
     endpoint = request.url.path
-    REQ_COUNT.labels(endpoint=endpoint, method=request.method, status=str(response.status_code)).inc()
+    REQ_COUNT.labels(
+        endpoint=endpoint, method=request.method, status=str(response.status_code)
+    ).inc()
     REQ_LATENCY.labels(endpoint=endpoint).observe(latency)
     return response
+
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
+
 @app.get("/metrics")
 def metrics():
     data = generate_latest()
-    return FastAPI.responses.Response(content=data, media_type=CONTENT_TYPE_LATEST)
+    return Response(content=data, media_type=CONTENT_TYPE_LATEST)
+
 
 @app.post("/score")
 def score(tx: Transaction):
@@ -44,6 +61,6 @@ def score(tx: Transaction):
         "flagged": flagged,
         "explanations": [
             "Night transactions and high amounts tend to increase risk.",
-            "Cross-border transactions may increase probability."
-        ]
+            "Cross-border transactions may increase probability.",
+        ],
     }

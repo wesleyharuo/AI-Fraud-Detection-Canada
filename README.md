@@ -12,6 +12,24 @@ Built with a modern ML stack: `pandas/polars`, `scikit-learn`, `CatBoost`, `Fast
 - Privacy‑aware design (PII minimization & audit log stubs)
 - Sample dataset & unit tests so you can run in minutes
 
+##  🚀 Live Demo
+Try the fraud-scoring model online, no install needed — fill in a transaction (or click a ready-made scenario) and get an instant decision with a SHAP-based explanation.
+
+👉 **[Open the live demo](#)** *(replace this link with your own Space URL once deployed — see below)*
+
+### Deploy your own copy for free (~5 minutes, no credit card)
+1. Create a free account at [huggingface.co](https://huggingface.co).
+2. Click **New Space** → SDK: `Gradio` → Hardware: `CPU basic` (free) → Visibility: `Public`.
+3. Hugging Face gives you a git URL for the new Space. Add it as a remote and push this repo:
+   ```bash
+   git remote add space https://huggingface.co/spaces/<your-username>/<space-name>
+   git push space claude/project-online-demo-c0d67v:main
+   ```
+4. In the Space's **Files** tab, open `README.md` and add one line to the YAML frontmatter at the top: `app_file: demo/app.py` (keep `sdk: gradio`).
+5. The Space rebuilds automatically (~1–2 min) and publishes a public URL like `https://huggingface.co/spaces/<user>/<space-name>` — share that link anywhere.
+
+`demo/app.py` loads the trained model from `model/artifacts.joblib` (already included in this repo) and falls back to training it automatically on first boot if the file is missing.
+
 ##  Quickstart
 ```bash
 python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
@@ -33,8 +51,12 @@ uvicorn api.app:app --reload --port 8000
 ai_fraud_detection_canada/
 ├── api/
 │   └── app.py
+├── demo/
+│   └── app.py              # Interactive Gradio demo (Hugging Face Spaces)
 ├── data/
 │   └── transactions_sample.csv
+├── scripts/
+│   └── generate_synthetic_data.py
 ├── src/
 │   ├── fraudkit/
 │   │   ├── __init__.py
@@ -46,6 +68,10 @@ ai_fraud_detection_canada/
 │   │   └── utils.py
 │   ├── train.py
 │   └── infer.py
+├── model/
+│   └── artifacts.joblib     # pre-trained model bundle
+├── ops/
+│   └── prometheus/prometheus.yml
 ├── tests/
 │   └── test_pipeline.py
 ├── config.yaml
