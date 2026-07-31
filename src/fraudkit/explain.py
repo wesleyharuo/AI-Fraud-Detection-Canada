@@ -1,5 +1,5 @@
 import shap
-import numpy as np
+
 
 def shap_explainer(model, X_sample):
     # TreeExplainer for LightGBM; fall back to KernelExplainer if needed
